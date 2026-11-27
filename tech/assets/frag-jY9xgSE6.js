@@ -1,0 +1,6 @@
+import{aB as v,g as c,k as p,u as f,M as y,P as h,o as w,a2 as P}from"./three.module-BZgG6AUv.js";import{m as g}from"./three-viewer-0rZIEDzf.js";import{G as x}from"./glsl-DOwCk4-f.js";const C=`
+uniform float uTime; uniform vec2 uRes; uniform vec3 uCamPos; uniform mat4 uCamWorld; uniform mat4 uProjInv;
+varying vec2 vUv;
+${x}
+vec3 rayDir(){ vec4 p = uProjInv * vec4(vUv * 2. - 1., 1., 1.); return normalize((uCamWorld * vec4(normalize(p.xyz / p.w), 0.)).xyz); }
+`;function S(m,r){return g(m,r,({camera:o,renderer:l})=>{const e={uTime:{value:0},uRes:{value:new p(1,1)},uCamPos:{value:new c},uCamWorld:{value:new v},uProjInv:{value:new v},...r.uniforms},s=new f({uniforms:e,vertexShader:"varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }",fragmentShader:C+r.frag,depthTest:!1,depthWrite:!1}),n=new y(new h(2,2),s);n.frustumCulled=!1;const i=new w;i.add(n);const d=new P(-1,1,1,-1,0,1);return{update(t,u){var a;e.uTime.value=u,o.updateMatrixWorld(),e.uCamPos.value.copy(o.position),e.uCamWorld.value.copy(o.matrixWorld),e.uProjInv.value.copy(o.projectionMatrixInverse),(a=r.update)==null||a.call(r,e,t,u)},render:()=>l.render(i,d),resize:(t,u,a)=>e.uRes.value.set(t*a,u*a),dispose:()=>{n.geometry.dispose(),s.dispose()}}})}export{S as m};

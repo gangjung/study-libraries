@@ -1,0 +1,23 @@
+import{p as x,r as E,k as S,g as v,aI as L,u as _,w as g,H as N,D as R,ac as T,aE as C,N as U}from"./three.module-BZgG6AUv.js";import{m as V}from"./three-viewer-0rZIEDzf.js";import{b as H}from"./head-BYvZqWNy.js";import"./face-sWqHSt7T.js";const A=`
+varying vec3 vN;
+void main(){
+  vN = normalize(mat3(modelMatrix) * normal);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
+}`,I=`
+uniform vec3 L; uniform float mode; uniform sampler2D hairMask; uniform vec2 res; uniform vec2 Ls; uniform float width;
+varying vec3 vN;
+void main(){
+  vec3 skin = vec3(1., .86, .78);
+  vec3 shade = skin * vec3(.82, .62, .7);
+  float lit = smoothstep(.47, .53, dot(normalize(vN), L) * .5 + .5);
+  float hs = 0.;
+  if (mode > .5) {
+    // 빛 쪽으로 width 픽셀 떨어진 곳에 머리카락이 있으면 = 그 머리카락이 이 픽셀을 가린다
+    vec2 uv = gl_FragCoord.xy / res;
+    hs = texture2D(hairMask, uv + Ls * width / res).r;
+  }
+  vec3 col = mix(shade, skin, lit * (1. - hs));
+  if (mode > 1.5) col = mix(col, vec3(1., .2, .8), hs * .6);
+  gl_FragColor = vec4(pow(col, vec3(2.2)), 1.);
+  #include <colorspace_fragment>
+}`;function P(){const a=new T(new Uint8Array([150,255]),2,1,C);return a.minFilter=a.magFilter=U,a.needsUpdate=!0,a}function W(a,o){return V(a,{antialias:!0,cam:[.5,.25,3.6],target:[0,.1,0]},({scene:n,camera:l,renderer:r})=>{n.background=new x(14542062);const w=P(),h=new E(4,4),u=new S(1,1),p={L:{value:new v},mode:{value:o==="screen"?1:o==="mask"?2:0},hairMask:{value:h.texture},res:{value:u},Ls:{value:new S},width:{value:10}},b=o==="shadowmap"?new L({color:16768203,gradientMap:w}):new _({uniforms:p,vertexShader:A,fragmentShader:I}),F=new L({color:4018058,gradientMap:w}),k=new g({color:2830165}),s=H(n,{face:b,hair:F,eye:k,brow:k}),d=[s.cap,s.back,...s.bangs.children];d.forEach(e=>e.layers.enable(1));const D=new N(16777215,8949920,1.6),i=new R(16777215,2.2);if(n.add(D,i,i.target),o==="shadowmap"){r.shadowMap.enabled=!0,i.castShadow=!0,i.shadow.mapSize.set(512,512);const e=i.shadow.camera;e.left=e.bottom=-1.4,e.right=e.top=1.4,e.near=.1,e.far=8,i.shadow.bias=-.002,d.forEach(c=>c.castShadow=!0),s.face.receiveShadow=!0}const M=new g({color:16777215}),y=new g({color:0}),z=new x(0);s.face.layers.enable(1);const f=new v;return{resize(e,c,t){u.set(Math.floor(e*t),Math.floor(c*t)),h.setSize(u.x,u.y)},update(e,c){const t=a.params.bool("animate")?Math.sin(c*.5)*.9:.35,m=new v(Math.sin(t)*.8,1.1,.9).normalize();i.position.copy(m).multiplyScalar(4),p.L.value.copy(m),f.copy(m).transformDirection(l.matrixWorldInverse),p.Ls.value.set(f.x,f.y).normalize(),p.width.value=a.params.num("width",14)*r.getPixelRatio(),a.hud({none:"머리카락 그림자 없음",shadowmap:"그림자 맵 512² (일반 그림자 방식)",screen:`화면 공간: 머리카락 마스크를 빛 방향으로 ${a.params.num("width",14)}px 밀어 비교`,mask:"분홍 = 마스크에서 판정된 앞머리 그림자"}[o])},render(){if(o==="screen"||o==="mask"){const e=n.background;n.background=z;const c=d.map(t=>t.material);d.forEach(t=>t.material=M),s.face.material=y,l.layers.set(1),r.setRenderTarget(h),r.clear(),r.render(n,l),l.layers.set(0),d.forEach((t,m)=>t.material=c[m]),s.face.material=b,n.background=e,r.setRenderTarget(null)}r.render(n,l)},dispose(){h.dispose(),w.dispose(),M.dispose(),y.dispose(),r.shadowMap.enabled=!1}}})}const j=[{mode:"none",title:"그림자 없음",kind:"before",caption:'앞머리가 이마에 그림자를 드리우지 않으면 머리카락이 얼굴에 "붙인 스티커"처럼 떠 보인다.'},{mode:"shadowmap",title:"그림자 맵",kind:"variant",caption:"일반 그림자 맵은 해상도가 얼굴 크기에 비해 거칠어 경계가 계단지고, 코·눈두덩에 원치 않는 그림자 조각과 그림자 여드름(acne)이 생긴다. 얼굴엔 아예 그림자를 받지 않게 하는 게임도 많다."},{mode:"screen",title:"화면 공간 앞머리 그림자",kind:"after",caption:"머리카락만 마스크 텍스처에 그린 뒤, 얼굴 셰이더에서 빛 방향으로 몇 픽셀 떨어진 곳의 마스크를 읽는다. 앞머리 실루엣 모양 그대로 또렷한 그림자가 이마에 생긴다."},{mode:"mask",title:"판정 영역",kind:"info",caption:"분홍이 앞머리 그림자로 판정된 영역. 머리카락 모양을 빛 방향으로 평행 이동한 것과 같다."}],J={layout:"compare",intro:"애니풍 원화에서 앞머리는 이마와 눈가에 <b>머리카락 모양 그대로의 또렷한 그림자</b>를 드리웁니다. 일반 그림자 맵은 해상도·필터링 때문에 얼굴에서 지저분해지므로, 원신 같은 애니풍 게임의 분석·재현에서 널리 소개된 방식처럼 <b>머리카락 마스크를 화면 공간에서 빛 방향으로 밀어</b> 얼굴에 겹쳐 그립니다.",how:["머리카락 메시만 스텐실 또는 별도 렌더 타깃에 마스크로 기록 (깊이도 함께 저장하면 더 정확).","광원 방향을 뷰 공간으로 변환해 화면 2D 방향을 구함.","얼굴 셰이더: uv + 방향 × 폭에서 마스크 샘플 → 머리카락이 있으면 그늘. 폭은 카메라 거리로 보정.","깊이 버전: 그 위치 머리카락 깊이가 얼굴보다 앞일 때만 그림자 (뒤쪽 머리카락 오판 방지).","결과 그늘은 얼굴 SDF 그림자·램프와 같은 색으로 합성."],pros:["머리카락 실루엣 그대로의 깔끔한 그림자","해상도가 화면 해상도와 같아 계단 없음","패스 하나 + 샘플 하나로 저렴"],cons:["진짜 3D 그림자가 아니라 빛이 크게 기울면 위치가 부정확","화면 밖 머리카락은 그림자를 못 만듦","머리카락 전용 패스 필요"],usedIn:"원신·붕괴 스타레일·젠레스 존 제로 등 애니풍 게임의 또렷한 앞머리 그림자(커뮤니티 분석상 스텐실/화면 공간 방식으로 추정, 공식 비공개), Unity URP 커뮤니티 툰 셰이더의 “Screen Space Hair Shadow” 렌더러 기능.",controls:[{type:"range",key:"width",label:"그림자 밀기 폭 (px)",min:2,max:40,step:1,value:14},{type:"toggle",key:"animate",label:"광원 흔들기",value:!0}],viewers:j.map(a=>({title:a.title,kind:a.kind,caption:a.caption,mount:o=>W(o,a.mode)}))};export{J as default};

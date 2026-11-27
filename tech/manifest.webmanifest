@@ -1,0 +1,12 @@
+{
+  "name": "게임 기술 도서관",
+  "short_name": "게임기술",
+  "description": "직접 돌려보는 게임 기술 학습 라이브러리",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a0d13",
+  "theme_color": "#0a0d13",
+  "lang": "ko",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
